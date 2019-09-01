@@ -1,5 +1,5 @@
 -d mnist
--dp /home/tscott/Documents/datasets/mnist 
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/mnist 
 --t1_train 0
 --t1_valid 0
 -k 1000
@@ -14,6 +14,6 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/mnist/mnist_1000_5/baseline
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/mnist/mnist_1000_5/baseline/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_1000_5/baseline
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_1000_5/baseline/log.txt
 baseline

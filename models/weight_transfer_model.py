@@ -10,6 +10,8 @@ from functools import partial
 import os
 import sys
 import tensorflow as tf
+import pdb
+
 
 from .model import Model
 from .utils import assign_to_device, _conv, define_scope, _fully_connected, get_available_gpus, _max_pooling, _relu, _softmax
@@ -45,6 +47,7 @@ class WeightTransferModel(Model):
     def optimize(self):
         d = self.get_single_device()
         with tf.device(assign_to_device(d, self.config.controller)):
+           
             pred = self.prediction
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, 
                 labels=tf.one_hot(self.target, self.config.n)))
@@ -53,7 +56,7 @@ class WeightTransferModel(Model):
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 train_op = optimizer.minimize(cost)
-
+            pdb.set_trace()
             return train_op, cost
 
     @define_scope(scope='stream_metrics')

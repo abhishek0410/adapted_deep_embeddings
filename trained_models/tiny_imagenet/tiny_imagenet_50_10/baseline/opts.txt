@@ -1,5 +1,5 @@
 -d tiny_imagenet
--dp /home/tscott/Documents/datasets/tiny_imagenet/tiny-imagenet-200 
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/tiny_imagenet/tiny-imagenet-200 
 -k 50
 -n 10
 -e 1000
@@ -11,6 +11,6 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_50_10/baseline
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_50_10/baseline/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_50_10/baseline
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_50_10/baseline/log.txt
 baseline

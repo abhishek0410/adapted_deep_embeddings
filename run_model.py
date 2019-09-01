@@ -4,6 +4,7 @@ import numpy as np
 import os
 import random
 import tensorflow as tf
+import pdb
 
 from data.mnist.read_mnist import MNIST
 from data.isolet.read_isolet import Isolet
@@ -11,7 +12,6 @@ from data.omniglot.read_omniglot import Omniglot
 from data.tiny_imagenet.read_tiny_imagenet import TinyImageNet
 from data.episode_generator import generate_training_episode, generate_evaluation_episode 
 from losses.histogram_loss import train_batches
-from models.hist_model import *
 from models.proto_model import *
 from models.weight_transfer_model import *
 from models.baseline_model import *
@@ -330,8 +330,9 @@ def get_model(params):
     elif params['command'] == 'weight_transfer':
         if params['dataset'] == 'mnist':
             model = MNISTWeightTransferModel(params)
-            data = MNIST(params['data_path']).kntl_data_form(params['t1_train'], params['t1_valid'], 
-                params['k'], params['n'], params['t2_test'])
+            data = MNIST(params['data_path']).kntl_data_form(params['t1_train'], params['t1_valid'],params['k'], params['n'], params['t2_test'])
+	    
+	   
         elif params['dataset'] == 'isolet':
             model = IsoletWeightTransferModel(params)
             data = Isolet(params['data_path']).kntl_data_form(250, params['n'], params['k'], params['n'])
@@ -341,6 +342,7 @@ def get_model(params):
         else:
             model = TinyImageNetWeightTransferModel(params)
             data = TinyImageNet(params['data_path']).kntl_data_form(350, params['n'], params['k'], params['n'])
+	    
     elif params['command'] == 'baseline':
         if params['dataset'] == 'mnist':
             model = MNISTBaselineModel(params)
@@ -359,25 +361,31 @@ def get_model(params):
         print('Unknown model type')
         logging.debug('Unknown model type')
         quit()
-
+    pdb.set_trace()
     return model, data
 
 def run(params):
     params = vars(params)
+#     {'dataset': 'mnist', 'data_path': '/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/mnist', 't1_train': 8000, 't1_valid': 3000, 'k': 10, 'n': 5, 't2_test': 10000, 'epochs': 500, 'batch_size': 2048, 'learning_rate': 0.005, 'patience': 20, 'percentage_es': 0.01, 'random_seed': 1234, 'replications': 1, 'gpu': '0', 'controller': '/cpu:0', 'save_dir': '/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer', 'log_file': '/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer/log.txt', 'command': 'weight_transfer'}
+
     logging.info(params)
 
     random.seed(params['random_seed'])
-    initialization_seq = random.sample(range(50000), params['replications'])
+    initialization_seq = random.sample(range(50000), params['replications']) 
+    ##initialization_seq = 28883
 
     config = tf.ConfigProto(allow_soft_placement=True)
     config.gpu_options.allow_growth = True
+    pdb.set_trace()
     for rep in range(params['replications']):
-        tf.reset_default_graph()
+        tf.reset_default_graph()  #This does siemthing like clearing the default graph stack and i have no idea what does that mean 
         with tf.Session(config=config) as sess:
             #tf.set_random_seed(initialization_seq[rep])
             np.random.seed(initialization_seq[rep])
             
             model, data = get_model(params)
+            #model : weight_transfer_model.MNISTWeightTransferModel
+         
             assert not model is None
             assert not data is None
             
@@ -391,7 +399,7 @@ def run(params):
             model.config['save_dir_by_rep'] = rep_path
 
             logging.debug('running training/testing')
-
+            pdb.set_trace()
             if params['command'] == 'baseline':
                 train_classification(sess, model, data, params, weight_transfer=False)
             elif params['command'] == 'weight_transfer':
@@ -404,3 +412,5 @@ def run(params):
                 print('Unknown model type')
                 logging.debug('Unknown model type')
                 quit()
+            pdb.set_trace()
+            print("Inside run(params): in run_model.py")

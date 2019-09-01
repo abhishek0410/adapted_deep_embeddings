@@ -1,5 +1,5 @@
 -d isolet
--dp /home/tscott/Documents/datasets/isolet 
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/isolet 
 -k 1
 -n 5
 -lr 0.0001
@@ -9,8 +9,8 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_1_5/proto_net
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_1_5/proto_net/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_1_5/proto_net
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_1_5/proto_net/log.txt
 proto
 --classes_per_episode 5
 --query_train_per_class 50
