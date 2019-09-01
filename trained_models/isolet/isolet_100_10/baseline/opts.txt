@@ -1,5 +1,5 @@
 -d isolet
--dp /home/tscott/Documents/datasets/isolet
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/isolet
 -k 100
 -n 10
 -e 1000
@@ -11,6 +11,6 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_100_10/baseline
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_100_10/baseline/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_100_10/baseline
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_100_10/baseline/log.txt
 baseline

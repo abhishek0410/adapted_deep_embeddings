@@ -1,5 +1,5 @@
 -d omniglot
--dp /home/tscott/Documents/datasets/omniglot/data 
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/omniglot/data 
 -k 10
 -n 5
 -e 500
@@ -11,8 +11,8 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/omniglot/omniglot_10_5/hist_loss
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/omniglot/omniglot_10_5/hist_loss/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/omniglot/omniglot_10_5/hist_loss
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/omniglot/omniglot_10_5/hist_loss/log.txt
 hist_loss
 --dist cos
 --kappa 1

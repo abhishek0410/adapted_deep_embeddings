@@ -1,5 +1,5 @@
 -d isolet
--dp /home/tscott/Documents/datasets/isolet 
+-dp /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/isolet 
 -k 200 
 -n 10
 -e 750
@@ -11,6 +11,6 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_200_10/weight_transfer
--lf /home/tscott/Documents/projects/adapted_deep_embeddings/trained_models/isolet/isolet_200_10/weight_transfer/log.txt
+-sd /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_200_10/weight_transfer
+-lf /home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/isolet/isolet_200_10/weight_transfer/log.txt
 weight_transfer
