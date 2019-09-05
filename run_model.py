@@ -40,7 +40,9 @@ def train_classification(sess, model, data, params, weight_transfer=True):
             if valid_acc > initial_best_epoch['valid_acc']:
                 initial_best_epoch['epoch'] = epoch
                 initial_best_epoch['valid_acc'] = valid_acc
-                model.save_model(sess, epoch)
+                model.save_model(sess, epoch) 
+                ##Saves the model at the following location : 
+                ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
 
             if epoch - initial_best_epoch['epoch'] >= params['patience']:
                 print('Early Stopping Epoch: {}\n'.format(epoch))
@@ -50,7 +52,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         print('Initial training done \n')
         logging.info('Initial training done \n')
 
-        model.restore_model(sess)
+        model.restore_model(sess) ##Restores the model after creating it .
 
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
@@ -392,6 +394,8 @@ def run(params):
             init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             params['init'] = init
             model.create_saver()
+            #self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=1)
+
             sess.run(init)
             
             rep_path = os.path.join(params['save_dir'], 'replication{}'.format(rep + 1))
