@@ -24,7 +24,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
 
-        for epoch in range(1, params['epochs'] + 1):
+#         for epoch in range(1, params['epochs'] + 1):
+        for epoch in range(1, 10):
 
             shuffle = np.random.permutation(len(y_train))
             x_train, y_train = x_train[shuffle], y_train[shuffle]
@@ -53,6 +54,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         logging.info('Initial training done \n')
 
         model.restore_model(sess) ##Restores the model after creating it .
+        
+        pdb.set_trace()
 
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0

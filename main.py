@@ -92,7 +92,7 @@ def get_opts():
 
 def main():
     params = get_opts()
-#     params = Namespace(batch_size=2048, command='weight_transfer', controller='/cpu:0', data_path='/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/datasets/mnist', dataset='mnist', epochs=500, gpu='0', k=10, learning_rate=0.005, log_file='/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer/log.txt', n=5, patience=20, percentage_es=0.01, random_seed=1234, replications=1, save_dir='/home/abhishek/Desktop/Research_Papers/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer', t1_train=8000, t1_valid=3000, t2_test=10000) 
+#     params = Namespace(batch_size=2048, command='weight_transfer', controller='/cpu:0', data_path='/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/datasets/mnist', dataset='mnist', epochs=500, gpu='0', k=10, learning_rate=0.005, log_file=/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer/log.txt', n=5, patience=20, percentage_es=0.01, random_seed=1234, replications=1, save_dir='/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_10_5/weight_transfer', t1_train=8000, t1_valid=3000, t2_test=10000) 
 
     if params.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(params.gpu)
