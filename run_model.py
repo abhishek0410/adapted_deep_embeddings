@@ -5,6 +5,7 @@ import os
 import random
 import tensorflow as tf
 import pdb
+import keras as keras
 
 from data.mnist.read_mnist import MNIST
 from data.isolet.read_isolet import Isolet
@@ -24,8 +25,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
 
-#         for epoch in range(1, params['epochs'] + 1):
-        for epoch in range(1, 10):
+        for epoch in range(1, params['epochs'] + 1):
+#         for epoch in range(1, 10):
 
             shuffle = np.random.permutation(len(y_train))
             x_train, y_train = x_train[shuffle], y_train[shuffle]
@@ -90,6 +91,16 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     print('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
     logging.info('Transfer training done \n')
     logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
+    
+    
+    
+    
+    
+def transfer_learningA():
+
+	
+    
+    
 
 def train_histogram_loss(sess, model, data, params):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data

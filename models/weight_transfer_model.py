@@ -29,6 +29,8 @@ class WeightTransferModel(Model):
 
     def save_model(self, sess, step):
         self.saver.save(sess, os.path.join(self.config.save_dir_by_rep, 'model.ckpt'), global_step=step)
+        # self.saver.save(sess, os.path.join(self.config.save_dir_by_rep, 'model.h5'), global_step=step)
+
 
     def restore_model(self, sess):
         checkpoint = tf.train.latest_checkpoint(self.config.save_dir_by_rep)
