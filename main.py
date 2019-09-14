@@ -98,7 +98,7 @@ def main():
         os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(params.gpu)
 
     logging.basicConfig(filename=params.log_file, level=logging.DEBUG)
-    pdb.set_trace()
+    #pdb.set_trace()
     print("Inside main() in main.py()")
     run(params)
 

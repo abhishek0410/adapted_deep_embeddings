@@ -5,7 +5,7 @@ import os
 import random
 import tensorflow as tf
 import pdb
-import keras as keras
+
 
 from data.mnist.read_mnist import MNIST
 from data.isolet.read_isolet import Isolet
@@ -56,7 +56,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
         model.restore_model(sess) ##Restores the model after creating it .
         
-        pdb.set_trace()
+        #pdb.set_trace()
 
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
@@ -97,6 +97,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     
     
 def transfer_learningA():
+	pass
+
 
 	
     
@@ -377,7 +379,7 @@ def get_model(params):
         print('Unknown model type')
         logging.debug('Unknown model type')
         quit()
-    pdb.set_trace()
+    #pdb.set_trace()
     return model, data
 
 def run(params):
@@ -392,7 +394,7 @@ def run(params):
 
     config = tf.ConfigProto(allow_soft_placement=True)
     config.gpu_options.allow_growth = True
-    pdb.set_trace()
+    #pdb.set_trace()
     for rep in range(params['replications']):
         tf.reset_default_graph()  #This does siemthing like clearing the default graph stack and i have no idea what does that mean 
         with tf.Session(config=config) as sess:
@@ -417,7 +419,7 @@ def run(params):
             model.config['save_dir_by_rep'] = rep_path
 
             logging.debug('running training/testing')
-            pdb.set_trace()
+            #pdb.set_trace()
             if params['command'] == 'baseline':
                 train_classification(sess, model, data, params, weight_transfer=False)
             elif params['command'] == 'weight_transfer':
@@ -430,5 +432,5 @@ def run(params):
                 print('Unknown model type')
                 logging.debug('Unknown model type')
                 quit()
-            pdb.set_trace()
+            #pdb.set_trace()
             print("Inside run(params): in run_model.py")

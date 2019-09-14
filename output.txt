@@ -1,0 +1,1 @@
+valid [1 / 501] valid accuracy: 0.3683333396911621 learning Rate :0.005

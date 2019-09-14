@@ -58,7 +58,7 @@ class WeightTransferModel(Model):
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 train_op = optimizer.minimize(cost)
-            pdb.set_trace()
+            #pdb.set_trace()
             return train_op, cost
 
     @define_scope(scope='stream_metrics')
