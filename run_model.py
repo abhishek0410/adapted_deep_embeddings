@@ -21,88 +21,125 @@ from utils import classification_batch_evaluation, hist_loss_batch_eval, proto_e
 
 def train_classification(sess, model, data, params, weight_transfer=True):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data
-
+    flag = False
+#     pdb.set_trace()
+  
+    temp_learning_rate_source_training = params['learning_rate']
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
+    
+    with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+        print("SOURCE -TRAINING BEGINS",file =f)
+        if flag==False:
+            for epoch in range(1, params['epochs'] + 1):
+                shuffle = np.random.permutation(len(y_train))
+                x_train, y_train = x_train[shuffle], y_train[shuffle]
 
-        for epoch in range(1, params['epochs'] + 1):
-#         for epoch in range(1, 10):
 
-            shuffle = np.random.permutation(len(y_train))
-            x_train, y_train = x_train[shuffle], y_train[shuffle]
-            for i in range(0, len(y_train), params['batch_size']):
-                x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
-                sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
+                for i in range(0, len(y_train), params['batch_size']):
+                    x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
 
-            valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
+    #                 sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
+                    sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: temp_learning_rate_source_training})
+                    
+       
 
-            print('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
-            logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
 
-            if valid_acc > initial_best_epoch['valid_acc']:
-                initial_best_epoch['epoch'] = epoch
-                initial_best_epoch['valid_acc'] = valid_acc
-                model.save_model(sess, epoch) 
-                ##Saves the model at the following location : 
-                ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
+                valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
 
-            if epoch - initial_best_epoch['epoch'] >= params['patience']:
-                print('Early Stopping Epoch: {}\n'.format(epoch))
-                logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-                break
+                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
+                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
+                logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
 
-        print('Initial training done \n')
+                if valid_acc > initial_best_epoch['valid_acc']:
+                    initial_best_epoch['epoch'] = epoch
+                    initial_best_epoch['valid_acc'] = valid_acc
+                    model.save_model(sess, epoch) 
+                    ##Saves the model at the following location : 
+                    ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
+
+                    ##A
+                    ##Trying to save model as an HDF5 file
+    #                 model.save('my_model.h5')
+
+
+                if epoch - initial_best_epoch['epoch'] >= params['patience']:
+                    print('Early Stopping Epoch: {}\n'.format(epoch))
+                    logging.info('Early Stopping Epoch: {}\n'.format(epoch))
+                    break
+         
+
+        print('Initial training done \n',file=f)
         logging.info('Initial training done \n')
+        sess.close()      
 
-        model.restore_model(sess) ##Restores the model after creating it .
-        
+    model.restore_model(sess) ##Restores the model after creating it .
+
         #pdb.set_trace()
-
+    flag =True
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
-
-    for epoch in range(1, params['epochs'] + 1):
-        shuffle = np.random.permutation(len(y_train2))
-        x_train2, y_train2 = x_train2[shuffle], y_train2[shuffle]
-        for i in range(0, len(y_train2), params['batch_size']):
-            x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
-            sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: params['learning_rate']})
-
-        train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
-
-        print('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
-        logging.info('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
-
-        if train_acc > transfer_best_epoch['train_acc']:
-            transfer_best_epoch['epoch'] = epoch
-            transfer_best_epoch['train_acc'] = train_acc
-            test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
-            transfer_best_epoch['test_acc'] = test_acc
-
-        if epoch % params['patience'] == 0:
-            acc_diff = transfer_best_epoch['train_acc'] - es_acc
-            if acc_diff < params['percentage_es'] * es_acc:
-                print('Early Stopping Epoch: {}\n'.format(epoch))
-                logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-                break
-            es_acc = transfer_best_epoch['train_acc']
-
-    print('Transfer training done \n')
-    print('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
-    logging.info('Transfer training done \n')
-    logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
+#     model.freeze = True
+#     print("Model parameters are ",model.freeze)
+#     for temp_learning_rate_source_training in range (0.001,0.005,0.01):
+#         for decay_after_epoch in range(3,5,10):
     
-    
-    
-    
-    
+        
+
+    for temp_learning_rate_target_training in (0.001,0.005,0.01):
+        
+        for decay_after_epoch in (3,5,10): 
+            learning_rate = temp_learning_rate_target_training
+            model.restore_model(sess) ##Restores the model after creating it .
+            with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
+                with open("/home/abhishek/Desktop/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "w") as f:
+                    for x in f1.readlines():
+                        f.write(x)
+                    print("Target Training Begins",file=f)
+                    for epoch in range(1, params['epochs'] + 1):
+                        shuffle = np.random.permutation(len(y_train2))
+                        x_train2, y_train2 = x_train2[shuffle], y_train2[shuffle]
+
+
+                        if epoch%decay_after_epoch==0 and epoch <=decay_after_epoch:
+                            learning_rate = learning_rate *0.1
+                        elif (epoch-decay_after_epoch)%30==0:
+                            learning_rate = learning_rate *0.1
+
+
+
+                        for i in range(0, len(y_train2), params['batch_size']):
+                            x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
+                            sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: params['learning_rate']})
+
+                        train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
+                        sess.close()
+
+                        print('train [{} / {}] train accuracy: {} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,learning_rate),file=f)
+                        print('train [{} / {}] train accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, train_acc,learning_rate))
+                        logging.info('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
+
+                        if train_acc > transfer_best_epoch['train_acc']:
+                            transfer_best_epoch['epoch'] = epoch
+                            transfer_best_epoch['train_acc'] = train_acc
+                            test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
+                            transfer_best_epoch['test_acc'] = test_acc
+
+                        if epoch % params['patience'] == 0:
+                            acc_diff = transfer_best_epoch['train_acc'] - es_acc
+                            if acc_diff < params['percentage_es'] * es_acc:
+                                print('Early Stopping Epoch: {}\n'.format(epoch))
+                                logging.info('Early Stopping Epoch: {}\n'.format(epoch))
+                                break
+                            es_acc = transfer_best_epoch['train_acc']
+
+                    print('Transfer training done \n',file=f)
+                    print('TARGET test accuracy: {}'.format(transfer_best_epoch['test_acc']),file=f)
+                    logging.info('Transfer training done \n')
+                    logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))    
+
 def transfer_learningA():
 	pass
-
-
-	
-    
-    
 
 def train_histogram_loss(sess, model, data, params):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data

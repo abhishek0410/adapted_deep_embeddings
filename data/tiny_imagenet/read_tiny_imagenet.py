@@ -4,6 +4,7 @@ import random
 import numpy as np
 from scipy.ndimage import imread
 from scipy.misc import imresize
+import pdb
 
 class TinyImageNet():
     def __init__(self, path):
@@ -36,6 +37,7 @@ class TinyImageNet():
         images = []
         labels = []
         for root, dirs, files in os.walk(path):
+            
             for f in files:
                 if f == 'val_annotations.txt':
                     validation_annotations = os.path.join(root, f)
@@ -53,7 +55,8 @@ class TinyImageNet():
                             img = np.repeat(np.expand_dims(img, axis=2), 3, axis=2)
                         images.append(img)
                         labels.append(id_to_label[id])
-
+    
+        
         with open(validation_annotations) as val_ann:
             for line in val_ann:
                 contents = line.split()
