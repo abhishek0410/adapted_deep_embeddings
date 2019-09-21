@@ -71,7 +71,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
         print('Initial training done \n',file=f)
         logging.info('Initial training done \n')
-        sess.close()      
+         
 
     model.restore_model(sess) ##Restores the model after creating it .
 
@@ -86,7 +86,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     
         
 
-    for temp_learning_rate_target_training in (0.001,0.005,0.01):
+    for temp_learning_rate_target_training in (0.005,0.001,0.01):
         
         for decay_after_epoch in (3,5,10): 
             learning_rate = temp_learning_rate_target_training
@@ -113,11 +113,13 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                             sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: params['learning_rate']})
 
                         train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
-                        sess.close()
+                        # sess.close()
 
-                        print('train [{} / {}] train accuracy: {} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,learning_rate),file=f)
-                        print('train [{} / {}] train accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, train_acc,learning_rate))
+
                         logging.info('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
+                        test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
+                        print('train [{} / {}] train accuracy: {} test accuracy :{} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,test_acc,learning_rate),file=f)
+                        print('train [{} / {}] train accuracy: {} test accuracy :{} learning Rate :{}'.format(epoch, params['epochs'] + 1, train_acc,test_acc,learning_rate))
 
                         if train_acc > transfer_best_epoch['train_acc']:
                             transfer_best_epoch['epoch'] = epoch

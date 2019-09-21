@@ -2,8 +2,9 @@ import os
 import sys
 import random
 import numpy as np
-from PIL import Image
 import PIL
+from PIL import Image
+
 from scipy.misc import imresize
 import logging
 
