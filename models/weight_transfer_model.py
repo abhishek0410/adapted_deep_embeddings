@@ -37,6 +37,17 @@ class WeightTransferModel(Model):
         if checkpoint is None:
             sys.exit('Cannot restore model that does not exist')
         self.saver.restore(sess, checkpoint)
+    ##The below function saves the last checkpoint for the SOURCE - TRAINING :
+    def get_last_sourceTraining_checkpoint(self):
+        self.last_sourceTraining_checkpoint =  tf.train.latest_checkpoint(self.config.save_dir_by_rep)
+
+    ##This function  restores the model to the last source training Checkpoint
+    def restore_model_SOURCE_Trained(self, sess):
+        checkpoint = self.last_sourceTraining_checkpoint
+        # pdb.set_trace()
+        if checkpoint is None:
+            sys.exit('Cannot restore model that does not exist')
+        self.saver.restore(sess, checkpoint)
 
     def get_single_device(self):
         devices = get_available_gpus()
@@ -54,6 +65,21 @@ class WeightTransferModel(Model):
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, 
                 labels=tf.one_hot(self.target, self.config.n)))
             optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
+
+            update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+            with tf.control_dependencies(update_ops):
+                train_op = optimizer.minimize(cost)
+            #pdb.set_trace()
+            return train_op, cost
+     @define_scope
+    def optimize_with_diff_LR(self,optimizer):
+        d = self.get_single_device()
+        with tf.device(assign_to_device(d, self.config.controller)):
+           
+            pred = self.prediction
+            cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, 
+                labels=tf.one_hot(self.target, self.config.n)))
+            optimizer = optimizer
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):

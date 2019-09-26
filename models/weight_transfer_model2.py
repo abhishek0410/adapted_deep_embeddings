@@ -42,6 +42,18 @@ class WeightTransferModel(Model):
             sys.exit('Cannot restore model that does not exist')
         self.saver.restore(sess, checkpoint)
 
+        
+    ##The below function saves the last checkpoint for the SOURCE - TRAINING :
+    def get_last_sourceTraining_checkpoint(self):
+        self.last_sourceTraining_checkpoint =  tf.train.latest_checkpoint(self.config.save_dir_by_rep)
+
+    ##This function  restores the model to the last source training Checkpoint
+    def restore_model_SOURCE_Trained(self, sess):
+        checkpoint = self.last_sourceTraining_checkpoint
+        if checkpoint is None:
+            sys.exit('Cannot restore model that does not exist')
+        self.saver.restore(sess, checkpoint)
+
     def get_single_device(self):
         devices = get_available_gpus()
         d = self.config.controller
