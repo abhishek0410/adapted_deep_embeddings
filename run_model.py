@@ -22,7 +22,14 @@ from utils import classification_batch_evaluation, hist_loss_batch_eval, proto_e
 def train_classification(sess, model, data, params, weight_transfer=True):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data
     flag = False
-#     pdb.set_trace()
+    ##len(x_train) = 8000
+    ##len(y_train) = 8000
+    ##len(x_valid) =3000
+    ##len(x_train2) =50
+    ##len(y_train2) =50
+    ##len(x_test2) =10000
+    ##len(y_test2) = 10000
+    pdb.set_trace()
   
     temp_learning_rate_source_training = params['learning_rate']
     if weight_transfer:
@@ -60,17 +67,14 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                     ##Saves the model at the following location : 
                     ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
 
-                    ##A
+                   
                     ##Trying to save model as an HDF5 file
     #                 model.save('my_model.h5')
-                
-
 
                 if epoch - initial_best_epoch['epoch'] >= params['patience']:
                     print('Early Stopping Epoch: {}\n'.format(epoch))
                     logging.info('Early Stopping Epoch: {}\n'.format(epoch))
                     break
-
 
         print('Initial training done \n',file=f)
         logging.info('Initial training done \n')
@@ -86,7 +90,6 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 #     print("Model parameters are ",model.freeze)
 
     ##Getting the trainable variables : 
-    variables =  tf.trainable_variables()
     ''' [<tf.Variable 'prediction/conv1/conv_weights:0' shape=(3, 3, 1, 32) dtype=float32_ref>, 
         <tf.Variable 'prediction/conv1/conv_biases:0' shape=(32,) dtype=float32_ref>, 
         <tf.Variable 'prediction/conv2/conv_weights:0' shape=(3, 3, 32, 32) dtype=float32_ref>,
@@ -98,8 +101,14 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         <tf.Variable 'prediction/fc4/fc_weights:0' shape=(128, 5) dtype=float32_ref>,
         <tf.Variable 'prediction/fc4/fc_biases:0' shape=(5,) dtype=float32_ref>]
     ''' 
-    pdb.set_trace()
 
+    # variables_names = [v.name for v in tf.trainable_variables()]
+    # values = sess.run(variables_names)
+    # for k, v in zip(variables_names, values):
+    #     pdb.set_trace()
+    #     print("Variable: ", k)
+    #     print("Shape: ", v.shape)
+    #     print(v) 
 
 
     for temp_learning_rate_target_training in (0.005,0.001,0.01):
@@ -128,9 +137,14 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
 
 
+                        
+                        # for i in range(0, len(y_train2), params['batch_size']):
+                        #     x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
+                        #     sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: learning_rate})
+                        
                         for i in range(0, len(y_train2), params['batch_size']):
                             x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
-                            sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: learning_rate})
+                            sess.run(model.optimize_with_diff_LR, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: learning_rate})
 
                         train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
                         # sess.close()

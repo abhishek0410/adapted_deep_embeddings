@@ -64,6 +64,10 @@ class WeightTransferModel(Model):
             pred = self.prediction
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, 
                 labels=tf.one_hot(self.target, self.config.n)))
+
+
+
+            # pdb.set_trace()
             optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -71,20 +75,66 @@ class WeightTransferModel(Model):
                 train_op = optimizer.minimize(cost)
             #pdb.set_trace()
             return train_op, cost
-     @define_scope
-    def optimize_with_diff_LR(self,optimizer):
+    @define_scope
+    def optimize_with_diff_LR(self):
         d = self.get_single_device()
         with tf.device(assign_to_device(d, self.config.controller)):
            
             pred = self.prediction
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, 
                 labels=tf.one_hot(self.target, self.config.n)))
-            optimizer = optimizer
+
+
+            ##Using different learning rates for different layers, pass the different layer parameters in the Optimizers
+            ##Changing the Learning Rates for C.N.N layers to be 0.001 and for F.C layer to be 0.1 : 
+            variables = tf.trainable_variables()
+            pdb.set_trace()
+            sess = tf.Session()
+            graph = tf.get_default_graph()
+            # conv1_params_w = sess.graph.get_tensor_by_name("prediction/conv1/conv_weights:0")
+            # conv1_params_b = sess.graph.get_tensor_by_name("prediction/conv1/conv_biases:0")
+
+            tf.initialize_all_variables().run()
+
+            conv1_params_w = variables[0]
+            conv1_params_b = variables[1]
+
+
+            conv2_params_w = variables[2]
+            conv2_params_b = variables[3]
+  
+
+            conv_vars = [conv1_params_w,conv1_params_b,conv2_params_w,conv2_params_b]
+
+            fc1_params_w = variables[4]
+            fc1_params_b = variables[5]
+
+            fc3_params_w = variables[6]
+            fc3_params_b = variables[7]
+
+            fc_vars = [fc1_params_w,fc1_params_b,fc3_params_w,fc3_params_b]
+
+            opt1 = tf.train.AdamOptimizer(0.001)
+            opt2 = tf.train.AdamOptimizer(0.01)
+
+            grads = tf.gradients(cost, conv_vars + fc_vars)
+
+            grads1 = grads[:len(conv_vars)]
+            grads2 = grads[len(conv_vars):]
+
+            train_op1 = opt1.apply_gradients(zip(grads1, conv_vars))
+            train_op2 = opt2.apply_gradients(zip(grads2, fc_vars))
+
+            train_op = tf.group(train_op1, train_op2)
+            tf.initialize_all_variables().run()
+
+
+            optimizer = train_op
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
-                train_op = optimizer.minimize(cost)
-            #pdb.set_trace()
+                train_op = optimizer
+            # pdb.set_trace()
             return train_op, cost
 
     @define_scope(scope='stream_metrics')
