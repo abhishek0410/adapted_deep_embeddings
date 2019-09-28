@@ -23,6 +23,8 @@ class WeightTransferModel(Model):
         self.saver = None
         self.learning_rate = tf.placeholder(tf.float32)
         self.is_train = tf.placeholder(tf.bool)
+        self.learning_rate_CNN = tf.placeholder(tf.float32)
+        self.learning_rate_FN = tf.placeholder(tf.float32)
 
     def create_saver(self):
         self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=1)
@@ -88,7 +90,7 @@ class WeightTransferModel(Model):
             ##Using different learning rates for different layers, pass the different layer parameters in the Optimizers
             ##Changing the Learning Rates for C.N.N layers to be 0.001 and for F.C layer to be 0.1 : 
             variables = tf.trainable_variables()
-            pdb.set_trace()
+            # pdb.set_trace()
             sess = tf.Session()
             graph = tf.get_default_graph()
             # conv1_params_w = sess.graph.get_tensor_by_name("prediction/conv1/conv_weights:0")
@@ -114,8 +116,8 @@ class WeightTransferModel(Model):
 
             fc_vars = [fc1_params_w,fc1_params_b,fc3_params_w,fc3_params_b]
 
-            opt1 = tf.train.AdamOptimizer(0.001)
-            opt2 = tf.train.AdamOptimizer(0.01)
+            opt1 = tf.train.AdamOptimizer(self.learning_rate_CNN)
+            opt2 = tf.train.AdamOptimizer(self.learning_rate_FN)
 
             grads = tf.gradients(cost, conv_vars + fc_vars)
 

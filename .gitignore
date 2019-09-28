@@ -4,8 +4,7 @@ __pycache__/
 *$py.class
 
 **/opts*
-
-
+data/
 # C extensions
 *.so
 

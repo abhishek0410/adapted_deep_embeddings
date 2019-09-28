@@ -29,17 +29,21 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     ##len(y_train2) =50
     ##len(x_test2) =10000
     ##len(y_test2) = 10000
-    pdb.set_trace()
+    # pdb.set_trace()
   
     temp_learning_rate_source_training = params['learning_rate']
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
 #     with tf.Session() as sess:
-    with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+    folder_to_output_file_to  = "/home/abhishek/Desktop/V2_MNIST_" + str(params["k"])+"_"+str(params["n"])
+    # pdb.set_trace()
+    #path_of_the_source_training = os.path.join("/home/abhishek/Desktop","V2_MNIST_",str(params["k"]),str(params["n"])) +".txt"
+    # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+    with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
         print("SOURCE -TRAINING BEGINS",file =f)
         if flag==False:
-            for epoch in range(1,3):
-            # for epoch in range(1, params['epochs'] + 1):
+            # for epoch in range(1,3):
+            for epoch in range(1, params['epochs'] + 1):
                 shuffle = np.random.permutation(len(y_train))
                 x_train, y_train = x_train[shuffle], y_train[shuffle]
 
@@ -101,26 +105,24 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         <tf.Variable 'prediction/fc4/fc_weights:0' shape=(128, 5) dtype=float32_ref>,
         <tf.Variable 'prediction/fc4/fc_biases:0' shape=(5,) dtype=float32_ref>]
     ''' 
-
-    # variables_names = [v.name for v in tf.trainable_variables()]
-    # values = sess.run(variables_names)
-    # for k, v in zip(variables_names, values):
-    #     pdb.set_trace()
-    #     print("Variable: ", k)
-    #     print("Shape: ", v.shape)
-    #     print(v) 
+    ##Specify the Learning Rates for different layers : 
+    model.learning_rate_CNN = 0.001
+    
 
 
-    for temp_learning_rate_target_training in (0.005,0.001,0.01):
+    for temp_learning_rate_target_training in (0.005,0.001,0.01): ## break after first iteration
 
         for decay_after_epoch in (3,5,10): 
             train_loss = []
             test_loss = []
             learning_rate = temp_learning_rate_target_training
+            model.learning_rate_FN = temp_learning_rate_target_training
             model.restore_model_SOURCE_Trained(sess) ##Restores the model after creating it .
+         
 
-            with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
-                with open("/home/abhishek/Desktop/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "w") as f:
+            # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
+            with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
+                with open(folder_to_output_file_to+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "w") as f:
                     for x in f1.readlines():
                         f.write(x)
                     print("Target Training Begins",file=f)
@@ -132,15 +134,11 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
                         if epoch%decay_after_epoch==0 and epoch <=decay_after_epoch:
                             learning_rate = learning_rate *0.1
+                            model.learning_rate_FN = model.learning_rate_FN * 0.1
                         elif (epoch-decay_after_epoch)%30==0:
                             learning_rate = learning_rate *0.1
+                            model.learning_rate_FN = model.learning_rate_FN * 0.1
 
-
-
-                        
-                        # for i in range(0, len(y_train2), params['batch_size']):
-                        #     x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
-                        #     sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: learning_rate})
                         
                         for i in range(0, len(y_train2), params['batch_size']):
                             x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
@@ -153,24 +151,9 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                         test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
                         test_loss_temp = 1- test_acc
                         test_loss.append(test_loss_temp)
-                        print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp,learning_rate),file=f)
-                        print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp,learning_rate))
+                        print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp,model.learning_rate_FN),file=f)
+                        print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{} learning Rate:{} '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp,model.learning_rate_FN))
 
-#                         if train_acc > transfer_best_epoch['train_acc']:
-#                             transfer_best_epoch['epoch'] = epoch
-#                             transfer_best_epoch['train_acc'] = train_acc
-#                             test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
-#                             transfer_best_epoch['test_acc'] = test_acc
-                        # tf.reset_default_graph()
-#                         if epoch % params['patience'] == 0:
-#                             acc_diff = transfer_best_epoch['train_acc'] - es_acc
-#                             if acc_diff < params['percentage_es'] * es_acc:
-#                                 print('Early Stopping Epoch: {}\n'.format(epoch))
-#                                 logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-#                                 break
-#                             es_acc = transfer_best_epoch['train_acc']
-#                     sess.close
-                        ##Defining new stpponmg criteria : If test accuracy does not change for 5 continuous epochs , simply stop
                         if epoch >4 :
                             if(test_loss[epoch-1]==test_loss[epoch-5]):
                                 if(test_loss[epoch-2]==test_loss[epoch-4]):
@@ -185,8 +168,9 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                     print('Transfer training done \n',file=f)
                     print('TARGET test accuracy: {}'.format(transfer_best_epoch['test_acc']),file=f)
                     logging.info('Transfer training done \n')
-                    logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))    
-
+                    logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))  
+                    break  
+        break  ## break out after 1st iteration only 
 def transfer_learningA():
 	pass
 
