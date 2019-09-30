@@ -30,7 +30,10 @@ class WeightTransferModel(Model):
         self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=1)
 
     def save_model(self, sess, step):
-        self.saver.save(sess, os.path.join(self.config.save_dir_by_rep, 'model.ckpt'), global_step=step)
+        # self.saver.save(sess, os.path.join(self.config.save_dir_by_rep, 'model.ckpt'), global_step=step)
+        
+        self.saver.save(sess, os.path.join("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL", 'model.ckpt'), global_step=step)
+
         # self.saver.save(sess, os.path.join(self.config.save_dir_by_rep, 'model.h5'), global_step=step)
 
 

@@ -39,54 +39,72 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     # pdb.set_trace()
     #path_of_the_source_training = os.path.join("/home/abhishek/Desktop","V2_MNIST_",str(params["k"]),str(params["n"])) +".txt"
     # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
-    with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
-        print("SOURCE -TRAINING BEGINS",file =f)
-        if flag==False:
-            # for epoch in range(1,3):
-            for epoch in range(1, params['epochs'] + 1):
-                shuffle = np.random.permutation(len(y_train))
-                x_train, y_train = x_train[shuffle], y_train[shuffle]
+    # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+    
+    ##If the source training has been done already ,skip the following :
+    if (os.path.exists("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt")):
+        print("Source has already been trained")
+        # with tf.Session() as sess:
+            # tf.reset_default_graph()
+        # saver = tf.train.Saver()
+        # # Restore variables from disk.
+        # saver.restore(sess, "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL/model.ckpt-2")
+        # print("Model restored.")
+
+    else:
+        with open("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt", "a") as f:
+            print("SOURCE -TRAINING BEGINS",file =f)
+            if flag==False:
+                # for epoch in range(1,3):
+                for epoch in range(1, params['epochs'] + 1):
+                    shuffle = np.random.permutation(len(y_train))
+                    x_train, y_train = x_train[shuffle], y_train[shuffle]
 
 
-                for i in range(0, len(y_train), params['batch_size']):
-                    x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
+                    for i in range(0, len(y_train), params['batch_size']):
+                        x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
 
-    #                 sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
-                    sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: temp_learning_rate_source_training})
-#                 pdb.set_trace()
-
-
-                valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
-                ##model.metrics = <tf.Tensor 'stream_metrics/accuracy/update_op:0' shape=() dtype=float32>
-
-                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
-                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
-                logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
-
-                if valid_acc > initial_best_epoch['valid_acc']:
-                    initial_best_epoch['epoch'] = epoch
-                    initial_best_epoch['valid_acc'] = valid_acc
-                    model.save_model(sess, epoch) 
-                    model.get_last_sourceTraining_checkpoint()
-                    ##Saves the model at the following location : 
-                    ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
-
-                   
-                    ##Trying to save model as an HDF5 file
-    #                 model.save('my_model.h5')
-
-                if epoch - initial_best_epoch['epoch'] >= params['patience']:
-                    print('Early Stopping Epoch: {}\n'.format(epoch))
-                    logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-                    break
-
-        print('Initial training done \n',file=f)
-        logging.info('Initial training done \n')
+        #                 sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
+                        sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: temp_learning_rate_source_training})
+        #                 pdb.set_trace()
 
 
-    model.restore_model(sess) ##Restores the model after creating it .
+                    valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
+                    ##model.metrics = <tf.Tensor 'stream_metrics/accuracy/update_op:0' shape=() dtype=float32>
+
+                    print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
+                    print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
+                    logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
+
+                    if valid_acc > initial_best_epoch['valid_acc']:
+                        initial_best_epoch['epoch'] = epoch
+                        initial_best_epoch['valid_acc'] = valid_acc
+                        model.save_model(sess, epoch) 
+                        model.get_last_sourceTraining_checkpoint()
+                        ##Saves the model at the following location : 
+                        ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
+
+                        
+                        ##Trying to save model as an HDF5 file
+        #                 model.save('my_model.h5')
+
+                    if epoch - initial_best_epoch['epoch'] >= params['patience']:
+                        print('Early Stopping Epoch: {}\n'.format(epoch))
+                        logging.info('Early Stopping Epoch: {}\n'.format(epoch))
+                        break
+
+            print('Initial training done \n',file=f)
+            logging.info('Initial training done \n')
+
+
+            # model.restore_model(sess) ##Restores the model after creating it .
 
         #pdb.set_trace()
+    ##Restoring the model : 
+    saver = tf.train.Saver()
+    # Restore variables from disk.
+    saver.restore(sess, "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL/model.ckpt-36")
+    print("Model restored.")
     flag =True
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
@@ -112,21 +130,22 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
     for temp_learning_rate_target_training in (0.005,0.001,0.01): ## break after first iteration
 
-        for decay_after_epoch in (3,5,10): 
+        for decay_after_epoch in (10,3,5): 
             train_loss = []
             test_loss = []
             learning_rate = temp_learning_rate_target_training
             model.learning_rate_FN = temp_learning_rate_target_training
-            model.restore_model_SOURCE_Trained(sess) ##Restores the model after creating it .
-         
+            # model.restore_model_SOURCE_Trained(sess) ##Restores the model after creating it .
+        
 
             # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
-            with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
-                with open(folder_to_output_file_to+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "w") as f:
+            # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
+            with open("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt", "r+") as f1:
+                with open(folder_to_output_file_to+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "a") as f:
                     for x in f1.readlines():
                         f.write(x)
                     print("Target Training Begins",file=f)
-#                     for epoch in range(1, 3):
+                    # for epoch in range(1, 3):
                     for epoch in range(1, params['epochs'] + 1):
                         shuffle = np.random.permutation(len(y_train2))
                         x_train2, y_train2 = x_train2[shuffle], y_train2[shuffle]
@@ -164,7 +183,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                                             break
 
                             
-              
+            
                     print('Transfer training done \n',file=f)
                     print('TARGET test accuracy: {}'.format(transfer_best_epoch['test_acc']),file=f)
                     logging.info('Transfer training done \n')
@@ -504,3 +523,4 @@ def run(params):
                 quit()
             #pdb.set_trace()
             print("Inside run(params): in run_model.py")
+            
