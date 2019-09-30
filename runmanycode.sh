@@ -6,7 +6,7 @@
 ##Step 3 : Run the python Script
 
 
-for ((K=0;K<=300;K=K+5))
+for ((K=305;K<=305;K=K+5))
 do
 if [ $K -eq 0 ]
    then $K = $K+1
