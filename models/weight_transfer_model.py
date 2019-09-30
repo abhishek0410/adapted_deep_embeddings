@@ -18,14 +18,13 @@ from .utils import assign_to_device, _conv, define_scope, _fully_connected, get_
 
 class WeightTransferModel(Model):
 
-    def __init__(self, config,freeze):
+    def __init__(self, config):
         self.config = self.get_config(config)
         self.saver = None
         self.learning_rate = tf.placeholder(tf.float32)
         self.is_train = tf.placeholder(tf.bool)
         self.learning_rate_CNN = tf.placeholder(tf.float32)
         self.learning_rate_FN = tf.placeholder(tf.float32)
-        self.freeze =freeze
 
     def create_saver(self):
         self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=1)
@@ -77,15 +76,9 @@ class WeightTransferModel(Model):
             optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-
-            freeze_conv1  =tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,"prediction/conv1")
-            freeze_conv2  =tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,"prediction/conv2")
             with tf.control_dependencies(update_ops):
-                if self.freeze:
-                    train_op = optimizer.minimize(cost,var_list=freeze_conv1+ freeze_conv2)
-                else:
-                    train_op = optimizer.minimize(cost)
-    
+                train_op = optimizer.minimize(cost)
+            #pdb.set_trace()
             return train_op, cost
     @define_scope
     def optimize_with_diff_LR(self):
@@ -159,15 +152,14 @@ class WeightTransferModel(Model):
 
 class MNISTWeightTransferModel(WeightTransferModel):
 
-    def __init__(self, config,freeze):
-        super().__init__(config,freeze)
+    def __init__(self, config):
+        super().__init__(config)
         self.input = tf.placeholder(tf.float32, [None, 784])
         self.target = tf.placeholder(tf.int32, [None])
         self.is_task1 = tf.placeholder(tf.bool)
         self.prediction
         self.optimize
         self.metrics
-        self.freeze = freezegit 
 
     @define_scope
     def prediction(self):
