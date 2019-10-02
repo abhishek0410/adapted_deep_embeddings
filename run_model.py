@@ -20,9 +20,16 @@ from utils import classification_batch_evaluation, hist_loss_batch_eval, proto_e
 
 def train_classification(sess, model, data, params, weight_transfer=True):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data
+    flag = False
 
+
+
+    temp_learning_rate_source_training = params['learning_rate']
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
+
+    with open("/home/abhishek/Desktop/Results_Exp1/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+        print("SOURCE -TRAINING BEGINS",file =f)
 
         for epoch in range(1, params['epochs'] + 1):
 
@@ -34,7 +41,9 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
             valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
 
-            print('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
+            print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
+            print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
+
             logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
 
             if valid_acc > initial_best_epoch['valid_acc']:
@@ -52,7 +61,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         print('Initial training done \n')
         logging.info('Initial training done \n')
 
-        model.restore_model(sess) ##Restores the model after creating it .
+    model.restore_model(sess) ##Restores the model after creating it .
 
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
