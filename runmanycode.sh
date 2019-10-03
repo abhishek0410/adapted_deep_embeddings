@@ -2,12 +2,15 @@
 ##This is a shell script to run multiple instance of K and n 
 
 ##Step 1: Create the necessary folder as required by the code (and delete if alrady exists )
-##Step 1 : Create the folder where the output is going to be : 
-##Step2 : Remove the replication folder if already exists 
-##Step 3 : Run the python Script
+##Step 2 : Create the folder where the output is going to be : 
+##Step 3 : Remove the replication folder if already exists 
+##Step 4 : Run the python Script
+##Step 5 : Remove the fluff
 
 
-for ((K=01;K<=1;K=K+5))
+
+
+for ((K=300;K<=1000;K=K+50))
 do
 if [ $K -eq 0 ]
    then $K = $K+1
@@ -20,7 +23,9 @@ if [ -d "$DIR" ]; then
     rm -rf "$DIR"
 fi
 
-##Create the necessary folder 
+##Create the necessary folder
+  mkdir "/home/abhishek/Desktop/Results_Exp2"		
+  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model"
   mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5"
   mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer"
  touch "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/opts.txt"
@@ -50,12 +55,16 @@ weight_transfer
 
 
 ##Step 2 : 
-  mkdir "/home/abhishek/Desktop/V2_MNIST_$K""_5"
+    mkdir "/home/abhishek/Desktop/Results_Exp2"
 ##Step 3 : 
   rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/replication1"
 
 ##Step 4 :
 python3 main.py @"trained_models/mnist/mnist_$K""_5/weight_transfer/opts.txt"
+
+##Step 5 : 
+  rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5"
+
 
 done
 

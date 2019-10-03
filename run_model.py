@@ -42,7 +42,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
     
     ##If the source training has been done already ,skip the following :
-    if (os.path.exists("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt")):
+    if (os.path.exists("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt")):
         print("Source has already been trained")
         # with tf.Session() as sess:
             # tf.reset_default_graph()
@@ -52,7 +52,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         # print("Model restored.")
 
     else:
-        with open("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt", "a") as f:
+        with open("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt", "a") as f:
             print("SOURCE -TRAINING BEGINS",file =f)
             if flag==False:
                 # for epoch in range(1,3):
@@ -79,8 +79,10 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                     if valid_acc > initial_best_epoch['valid_acc']:
                         initial_best_epoch['epoch'] = epoch
                         initial_best_epoch['valid_acc'] = valid_acc
-                        model.save_model(sess, epoch) 
-                        model.get_last_sourceTraining_checkpoint()
+                        model.saver.save(sess, os.path.join("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model", 'model.ckpt'), global_step=epoch)
+                  
+                        # model.save_model(sess, epoch) 
+                        # model.get_last_sourceTraining_checkpoint()
                         ##Saves the model at the following location : 
                         ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
 
@@ -103,7 +105,10 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     ##Restoring the model : 
     saver = tf.train.Saver()
     # Restore variables from disk.
-    saver.restore(sess, "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL/model.ckpt-36")
+    all_files = os.listdir("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model")
+    model_path = os.path.splitext("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model/"+all_files[0])[0]
+    saver.restore(sess, model_path)
+    # saver.restore(sess, "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL/model.ckpt-36")
     print("Model restored.")
     flag =True
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
@@ -140,8 +145,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
             # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
             # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
-            with open("/home/abhishek/Desktop/V2_MNIST_SOURCE_TRAINING.txt", "r+") as f1:
-                with open(folder_to_output_file_to+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "a") as f:
+            with open("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt", "r+") as f1:
+                with open("/home/abhishek/Desktop/Results_Exp2"+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "a") as f:
                     for x in f1.readlines():
                         f.write(x)
                     print("Target Training Begins",file=f)
