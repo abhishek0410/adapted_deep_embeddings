@@ -3,7 +3,7 @@
 -dp /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/datasets/mnist 
 --t1_train 8000
 --t1_valid 3000
--k 5
+-k 450
 -n 5
 --t2_test 10000
 -e 500
@@ -15,7 +15,7 @@
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_5_5/weight_transfer
--lf /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_5_5/weight_transfer/log.txt
+-sd /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_450_5/weight_transfer
+-lf /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_450_5/weight_transfer/log.txt
 weight_transfer
 

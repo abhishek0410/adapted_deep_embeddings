@@ -2,6 +2,7 @@ import logging
 import math
 import numpy as np
 import os
+from os import listdir
 import random
 import tensorflow as tf
 import pdb
@@ -28,74 +29,101 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
 
-    with open("/home/abhishek/Desktop/Results_Exp1/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
-        print("SOURCE -TRAINING BEGINS",file =f)
+    ##Check if the source has already been trained : 
+    if(os.path.exists("/home/abhishek/Desktop/Results_Exp1/SOURCE_TRAINING.txt")):
+        print("Source training has already been done")
+    else:
+        with open("/home/abhishek/Desktop/Results_Exp1/SOURCE_TRAINING.txt", "a") as f:
+            print("SOURCE -TRAINING BEGINS",file =f)
 
-        for epoch in range(1, params['epochs'] + 1):
+            for epoch in range(1, params['epochs'] + 1):
 
-            shuffle = np.random.permutation(len(y_train))
-            x_train, y_train = x_train[shuffle], y_train[shuffle]
-            for i in range(0, len(y_train), params['batch_size']):
-                x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
-                sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
+                shuffle = np.random.permutation(len(y_train))
+                x_train, y_train = x_train[shuffle], y_train[shuffle]
+                for i in range(0, len(y_train), params['batch_size']):
+                    x_train_mb, y_train_mb = x_train[i:i + params['batch_size']], y_train[i:i + params['batch_size']]
+                    sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: True, model.is_train: True, model.learning_rate: params['learning_rate']})
 
-            valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
+                valid_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], True, x_valid, y=y_valid, stream=True)
 
-            print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
-            print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
+                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training),file =f)
+                print('valid [{} / {}] valid accuracy: {} learning Rate :{}'.format(epoch, params['epochs'] + 1, valid_acc,temp_learning_rate_source_training))
+                logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
 
-            logging.info('valid [{} / {}] valid accuracy: {}'.format(epoch, params['epochs'] + 1, valid_acc))
+                if valid_acc > initial_best_epoch['valid_acc']:
+                    initial_best_epoch['epoch'] = epoch
+                    initial_best_epoch['valid_acc'] = valid_acc
+                    model.saver.save(sess, os.path.join("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL_exp1", 'model.ckpt'), global_step=epoch)
+                    # model.save_model(sess, epoch) 
+                    ##Saves the model at the following location : 
+                    
 
-            if valid_acc > initial_best_epoch['valid_acc']:
-                initial_best_epoch['epoch'] = epoch
-                initial_best_epoch['valid_acc'] = valid_acc
-                model.save_model(sess, epoch) 
-                ##Saves the model at the following location : 
-                ##trained_models/mnist/mnist_10_5/weight_transfer/replication1
+                if epoch - initial_best_epoch['epoch'] >= params['patience']:
+                    print('Early Stopping Epoch: {}\n'.format(epoch))
+                    logging.info('Early Stopping Epoch: {}\n'.format(epoch))
+                    break
 
-            if epoch - initial_best_epoch['epoch'] >= params['patience']:
-                print('Early Stopping Epoch: {}\n'.format(epoch))
-                logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-                break
+            print('Initial training done \n')
+            logging.info('Initial training done \n')
+    
 
-        print('Initial training done \n')
-        logging.info('Initial training done \n')
-
-    model.restore_model(sess) ##Restores the model after creating it .
-
+    # model.restore_model(sess) ##Restores the model after creating it .
+    saver = tf.train.Saver()
+    # Restore variables from disk. 
+    ##Getting the latest model name : 
+    all_files = os.listdir("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL_exp1")
+    model_path = os.path.splitext("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL_exp1/"+all_files[0])[0]
+    saver.restore(sess, model_path)
+    print("Model restored.")
+    flag =True
     transfer_best_epoch = {'epoch': -1, 'train_acc': -1, 'test_acc': -1}
     es_acc = 0.0
+    train_loss = []
+    test_loss = []
 
-    for epoch in range(1, params['epochs'] + 1):
-        shuffle = np.random.permutation(len(y_train2))
-        x_train2, y_train2 = x_train2[shuffle], y_train2[shuffle]
-        for i in range(0, len(y_train2), params['batch_size']):
-            x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
-            sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: params['learning_rate']})
+    with open("/home/abhishek/Desktop/Results_Exp1/SOURCE_TRAINING.txt", "r+") as f1:
+        with open("/home/abhishek/Desktop/Results_Exp1"+ "/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
+            for x in f1.readlines():
+                f.write(x)
+            print("Target Training Begins",file=f)
+      
 
-        train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
+            for epoch in range(1, params['epochs'] + 1):
+                shuffle = np.random.permutation(len(y_train2))
+                x_train2, y_train2 = x_train2[shuffle], y_train2[shuffle]
+                for i in range(0, len(y_train2), params['batch_size']):
+                    x_train_mb, y_train_mb = x_train2[i:i + params['batch_size']], y_train2[i:i + params['batch_size']]
+                    sess.run(model.optimize, feed_dict={model.input: x_train_mb, model.target: y_train_mb, model.is_task1: False, model.is_train: True, model.learning_rate: params['learning_rate']})
 
-        print('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
-        logging.info('train [{} / {}] train accuracy: {}'.format(epoch, params['epochs'] + 1, train_acc))
+                train_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_train2, y=y_train2, stream=True)
+                test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
+                train_loss = 1- train_acc
+                test_loss_temp = 1- test_acc
+                test_loss.append(test_loss_temp)
 
-        if train_acc > transfer_best_epoch['train_acc']:
-            transfer_best_epoch['epoch'] = epoch
-            transfer_best_epoch['train_acc'] = train_acc
-            test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
-            transfer_best_epoch['test_acc'] = test_acc
+                print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{}  '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp),file=f)
+                print('train [{} / {}] train accuracy: {} train losss:{} test accuracy :{} test loss :{}  '.format(epoch, params['epochs'] + 1, train_acc,train_loss,test_acc,test_loss_temp))
 
-        if epoch % params['patience'] == 0:
-            acc_diff = transfer_best_epoch['train_acc'] - es_acc
-            if acc_diff < params['percentage_es'] * es_acc:
-                print('Early Stopping Epoch: {}\n'.format(epoch))
-                logging.info('Early Stopping Epoch: {}\n'.format(epoch))
-                break
-            es_acc = transfer_best_epoch['train_acc']
+                if train_acc > transfer_best_epoch['train_acc']:
+                    transfer_best_epoch['epoch'] = epoch
+                    transfer_best_epoch['train_acc'] = train_acc
+                    test_acc = classification_batch_evaluation(sess, model, model.metrics, params['batch_size'], False, x_test2, y=y_test2, stream=True)
+                    transfer_best_epoch['test_acc'] = test_acc
 
-    print('Transfer training done \n')
-    print('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
-    logging.info('Transfer training done \n')
-    logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
+                if epoch % params['patience'] == 0:
+                    acc_diff = transfer_best_epoch['train_acc'] - es_acc
+                    if acc_diff < params['percentage_es'] * es_acc:
+                        print('Early Stopping Epoch: {}\n'.format(epoch))
+                        logging.info('Early Stopping Epoch: {}\n'.format(epoch))
+                        break
+                    es_acc = transfer_best_epoch['train_acc']
+
+            print('Transfer training done \n')
+            print('Transfer training done \n' ,file =f)
+            print('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
+            print('test accuracy: {}'.format(transfer_best_epoch['test_acc']),file =f)
+            logging.info('Transfer training done \n')
+            logging.info('test accuracy: {}'.format(transfer_best_epoch['test_acc']))
 
 def train_histogram_loss(sess, model, data, params):
     (x_train, y_train), (x_valid, y_valid), (x_train2, y_train2), (x_test2, y_test2) = data
@@ -372,7 +400,7 @@ def get_model(params):
         print('Unknown model type')
         logging.debug('Unknown model type')
         quit()
-    pdb.set_trace()
+    # pdb.set_trace()
     return model, data
 
 def run(params):
@@ -387,7 +415,7 @@ def run(params):
 
     config = tf.ConfigProto(allow_soft_placement=True)
     config.gpu_options.allow_growth = True
-    pdb.set_trace()
+    # pdb.set_trace()
     for rep in range(params['replications']):
         tf.reset_default_graph()  #This does siemthing like clearing the default graph stack and i have no idea what does that mean 
         with tf.Session(config=config) as sess:
@@ -412,7 +440,7 @@ def run(params):
             model.config['save_dir_by_rep'] = rep_path
 
             logging.debug('running training/testing')
-            pdb.set_trace()
+            # pdb.set_trace()
             if params['command'] == 'baseline':
                 train_classification(sess, model, data, params, weight_transfer=False)
             elif params['command'] == 'weight_transfer':
@@ -425,5 +453,5 @@ def run(params):
                 print('Unknown model type')
                 logging.debug('Unknown model type')
                 quit()
-            pdb.set_trace()
+            # pdb.set_trace()
             print("Inside run(params): in run_model.py")
