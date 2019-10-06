@@ -8,16 +8,10 @@
 ##Step 5 : Remove the fluff
 
 
-
-
-for ((K=300;K<=1000;K=K+50))
-do
-if [ $K -eq 0 ]
-   then $K = $K+1
-fi
+function execute_code(){
 ##Step1
 ##Deleting the file if it exists already : 
-DIR=/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5
+DIR=/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5
 if [ -d "$DIR" ]; then
     echo "Removing Lock"
     rm -rf "$DIR"
@@ -25,15 +19,15 @@ fi
 
 ##Create the necessary folder
   mkdir "/home/abhishek/Desktop/Results_Exp2"		
-  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model"
-  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5"
-  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer"
- touch "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/opts.txt"
+  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/common_source_model"
+  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5"
+  mkdir "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer"
+ touch "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer/opts.txt"
 
 
 echo "
--d mnist
--dp /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/datasets/mnist 
+-d tiny_imagenet
+-dp /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/datasets/tiny_imagenet 
 --t1_train 8000
 --t1_valid 3000
 -k $K
@@ -48,22 +42,36 @@ echo "
 --replications 1
 -g 0
 -ctl /cpu:0
--sd /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer
--lf /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/log.txt
+-sd /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer
+-lf /home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer/log.txt
 weight_transfer
-" >> "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/opts.txt"
+" >> "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer/opts.txt"
 
 
 ##Step 2 : 
     mkdir "/home/abhishek/Desktop/Results_Exp2"
 ##Step 3 : 
-  rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5/weight_transfer/replication1"
+  rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer/replication1"
 
 ##Step 4 :
-python3 main.py @"trained_models/mnist/mnist_$K""_5/weight_transfer/opts.txt"
+python3 main.py @"trained_models/tiny_imagenet/tiny_imagenet_$K""_5/weight_transfer/opts.txt"
 
 ##Step 5 : 
-  rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/mnist_$K""_5"
+  rm -rf "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/tiny_imagenet_$K""_5"
+
+}
+
+
+for ((K=0;K<=300;K=K+10))
+do
+if [ $K -eq 0 ]
+then
+let "K=K +1"
+execute_code
+let "K=K-1"
+else 
+execute_code
+fi
 
 
 done

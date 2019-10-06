@@ -34,15 +34,14 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     temp_learning_rate_source_training = params['learning_rate']
     if weight_transfer:
         initial_best_epoch = {'epoch': -1, 'valid_acc': -1}
-#     with tf.Session() as sess:
-    folder_to_output_file_to  = "/home/abhishek/Desktop/V2_MNIST_" + str(params["k"])+"_"+str(params["n"])
+
     # pdb.set_trace()
     #path_of_the_source_training = os.path.join("/home/abhishek/Desktop","V2_MNIST_",str(params["k"]),str(params["n"])) +".txt"
     # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
     # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"]), "a") as f:
     
     ##If the source training has been done already ,skip the following :
-    if (os.path.exists("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt")):
+    if (os.path.exists("/home/abhishek/Desktop/common_source_training/tiny_Imagenet/SOURCE_TRAINING.txt")):
         print("Source has already been trained")
         # with tf.Session() as sess:
             # tf.reset_default_graph()
@@ -52,7 +51,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
         # print("Model restored.")
 
     else:
-        with open("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt", "a") as f:
+        with open("/home/abhishek/Desktop/common_source_training/tiny_Imagenet/SOURCE_TRAINING.txt", "a") as f:
             print("SOURCE -TRAINING BEGINS",file =f)
             if flag==False:
                 # for epoch in range(1,3):
@@ -79,7 +78,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
                     if valid_acc > initial_best_epoch['valid_acc']:
                         initial_best_epoch['epoch'] = epoch
                         initial_best_epoch['valid_acc'] = valid_acc
-                        model.saver.save(sess, os.path.join("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model", 'model.ckpt'), global_step=epoch)
+                        model.saver.save(sess, os.path.join("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/common_source_model", 'model.ckpt'), global_step=epoch)
                   
                         # model.save_model(sess, epoch) 
                         # model.get_last_sourceTraining_checkpoint()
@@ -105,8 +104,8 @@ def train_classification(sess, model, data, params, weight_transfer=True):
     ##Restoring the model : 
     saver = tf.train.Saver()
     # Restore variables from disk.
-    all_files = os.listdir("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model")
-    model_path = os.path.splitext("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/common_source_model/"+all_files[0])[0]
+    all_files = os.listdir("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/common_source_model")
+    model_path = os.path.splitext("/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/tiny_imagenet/common_source_model/"+all_files[0])[0]
     saver.restore(sess, model_path)
     # saver.restore(sess, "/home/abhishek/Desktop/ANU/comp_6470/adapted_deep_embeddings/trained_models/mnist/MODEL/model.ckpt-36")
     print("Model restored.")
@@ -145,7 +144,7 @@ def train_classification(sess, model, data, params, weight_transfer=True):
 
             # with open("/home/abhishek/Desktop/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
             # with open(folder_to_output_file_to+"/{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"])) as f1:
-            with open("/home/abhishek/Desktop/common_source_training/SOURCE_TRAINING.txt", "r+") as f1:
+            with open("/home/abhishek/Desktop/common_source_training/tiny_Imagenet/SOURCE_TRAINING.txt", "r+") as f1:
                 with open("/home/abhishek/Desktop/Results_Exp2"+"/{}_{}_{}_{}_{}.txt".format(params["dataset"],params["k"],params["n"],temp_learning_rate_target_training,decay_after_epoch), "a") as f:
                     for x in f1.readlines():
                         f.write(x)

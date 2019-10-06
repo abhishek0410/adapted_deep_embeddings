@@ -104,18 +104,26 @@ class WeightTransferModel(Model):
             conv1_params_w = variables[0]
             conv1_params_b = variables[1]
 
+            ##varaibles[2] = <tf.Variable 'prediction/batch_normalization/beta:0' shape=(32,) dtype=float32_ref>
+            conv2_params_w = variables[3]
+            conv2_params_b = variables[4]
 
-            conv2_params_w = variables[2]
-            conv2_params_b = variables[3]
+            conv3_params_w = variables[6]
+            conv3_params_b = variables[7]
+  
+            
+            conv4_params_w = variables[9]
+            conv4_params_b = variables[10]
   
 
-            conv_vars = [conv1_params_w,conv1_params_b,conv2_params_w,conv2_params_b]
+            conv_vars = [conv1_params_w,conv1_params_b,conv2_params_w,conv2_params_b,conv3_params_w,conv3_params_b,
+            conv4_params_w,conv4_params_b]
 
-            fc1_params_w = variables[4]
-            fc1_params_b = variables[5]
+            fc1_params_w = variables[12]
+            fc1_params_b = variables[13]
 
-            fc3_params_w = variables[6]
-            fc3_params_b = variables[7]
+            fc3_params_w = variables[16]
+            fc3_params_b = variables[17]
 
             fc_vars = [fc1_params_w,fc1_params_b,fc3_params_w,fc3_params_b]
 
