@@ -5,6 +5,9 @@ __pycache__/
 
 **/opts*
 data/
+
+##Don't track physical data
+datasets/
 # C extensions
 *.so
 
